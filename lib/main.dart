@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 void main() => runApp(const ValentineApp());
 
@@ -48,119 +47,143 @@ class _ValentineHomeState extends State<ValentineHome>
     super.dispose();
   }
 
+  bool showBalloons = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Cupid's Canvas")),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          DropdownButton<String>(
-            value: selectedEmoji,
-            items: emojiOptions
-                .map((e) =>
-                    DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (value) =>
-                setState(() => selectedEmoji = value ?? selectedEmoji),
+      appBar: AppBar(title: const Text('Cupid\'s Canvas')),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 1,
+            colors: <Color>[
+              Color.fromARGB(255, 228, 141, 209),
+              Color.fromARGB(255, 220, 126, 137),
+            ],
+            tileMode: TileMode.mirror,
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Center(
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _pulseController.value,
-                    child: CustomPaint(
-                      size: const Size(300, 300),
-                      painter:
-                          HeartEmojiPainter(type: selectedEmoji),
-                    ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 2),
+            Align(
+              alignment: Alignment.topLeft,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showBalloons = !showBalloons;
+                    }
                   );
                 },
-              ),
+                child: Text('Balloons!'),
+              )
             ),
+            const SizedBox(height: 14),
+            DropdownButton<String>(
+              value: selectedEmoji,
+              items: emojiOptions
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) => setState(() => selectedEmoji = value ?? selectedEmoji),
+            ),
+            const SizedBox(height: 14),
+            Expanded(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (showBalloons)
+                  Positioned(
+                    left: 10,
+                    child: SizedBox(
+                      width: 100,
+                      height: 150,
+                      child: Image.asset(
+                        'Assets/Images/balloons.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                if (showBalloons)
+                  Positioned(
+                    right: 10,
+                    child: SizedBox(
+                      width: 100,
+                      height: 150,
+                      child: Image.asset(
+                        'Assets/Images/balloons.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _pulseController.value,
+                      child: CustomPaint(
+                        size: const Size(300, 300),
+                        painter:
+                            HeartEmojiPainter(type: selectedEmoji),
+                      ),
+                    );
+                  },
+                ),
+              ]
+              ),
+            )
           ],
         ),
-      )
+      ),
     );
   }
 }
 
 class HeartEmojiPainter extends CustomPainter {
-  final String type;
   HeartEmojiPainter({required this.type});
+  final String type;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center =
-        Offset(size.width / 2, size.height / 2);
-
+    final center = Offset(size.width / 2, size.height / 2);
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Heart Shape
+    // Heart base
     final heartPath = Path()
       ..moveTo(center.dx, center.dy + 60)
-      ..cubicTo(center.dx + 110, center.dy - 10,
-          center.dx + 60, center.dy - 120,
-          center.dx, center.dy - 40)
-      ..cubicTo(center.dx - 60, center.dy - 120,
-          center.dx - 110, center.dy - 10,
-          center.dx, center.dy + 60)
+      ..cubicTo(center.dx + 110, center.dy - 10, center.dx + 60, center.dy - 120, center.dx, center.dy - 40)
+      ..cubicTo(center.dx - 60, center.dy - 120, center.dx - 110, center.dy - 10, center.dx, center.dy + 60)
       ..close();
 
-    // Different color = different emoji
-    paint.color =
-        type == 'Party Heart'
-            ? const Color(0xFFF48FB1)
-            : const Color(0xFFE91E63);
-
+    paint.color = type == 'Party Heart' ? const Color(0xFFF48FB1) : const Color(0xFFE91E63);
     canvas.drawPath(heartPath, paint);
 
-    // Face
+    // Face features (starter)
     final eyePaint = Paint()..color = Colors.white;
-    canvas.drawCircle(
-        Offset(center.dx - 30, center.dy - 10), 10, eyePaint);
-    canvas.drawCircle(
-        Offset(center.dx + 30, center.dy - 10), 10, eyePaint);
-
-    final pupilPaint = Paint()..color = Colors.black;
-    canvas.drawCircle(
-        Offset(center.dx - 28, center.dy - 8), 4, pupilPaint);
-    canvas.drawCircle(
-        Offset(center.dx + 32, center.dy - 8), 4, pupilPaint);
+    canvas.drawCircle(Offset(center.dx - 30, center.dy - 10), 10, eyePaint);
+    canvas.drawCircle(Offset(center.dx + 30, center.dy - 10), 10, eyePaint);
 
     final mouthPaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4;
+    canvas.drawArc(Rect.fromCircle(center: Offset(center.dx, center.dy + 20), radius: 30), 0, 3.14, false, mouthPaint);
 
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(center.dx, center.dy + 20), radius: 30),
-      0,
-      pi,
-      false,
-      mouthPaint,
-    );
-
-    // Party Hat (For Party Heart Only)
+    // Party hat placeholder (expand for confetti)
     if (type == 'Party Heart') {
-      final hatPaint = Paint()
-        ..color = const Color(0xFFFFD54F);
-
+      final hatPaint = Paint()..color = const Color(0xFFFFD54F);
       final hatPath = Path()
         ..moveTo(center.dx, center.dy - 110)
         ..lineTo(center.dx - 40, center.dy - 40)
         ..lineTo(center.dx + 40, center.dy - 40)
         ..close();
-
       canvas.drawPath(hatPath, hatPaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant HeartEmojiPainter oldDelegate) =>
-      oldDelegate.type != type;
+  bool shouldRepaint(covariant HeartEmojiPainter oldDelegate) => oldDelegate.type != type;
 }
