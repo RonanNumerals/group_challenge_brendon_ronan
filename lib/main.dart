@@ -22,9 +22,32 @@ class ValentineHome extends StatefulWidget {
   State<ValentineHome> createState() => _ValentineHomeState();
 }
 
-class _ValentineHomeState extends State<ValentineHome> {
+class _ValentineHomeState extends State<ValentineHome>
+    with SingleTickerProviderStateMixin {
+
   final List<String> emojiOptions = ['Sweet Heart', 'Party Heart'];
   String selectedEmoji = 'Sweet Heart';
+
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+      lowerBound: 0.95,
+      upperBound: 1.05,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  bool showBalloons = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +72,12 @@ class _ValentineHomeState extends State<ValentineHome> {
               alignment: Alignment.topLeft,
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Button pressed!'),
-                    ),
+                  setState(() {
+                    showBalloons = !showBalloons;
+                    }
                   );
                 },
-                child: Text('Click me'),
+                child: Text('Balloons!'),
               )
             ),
             const SizedBox(height: 14),
@@ -68,16 +90,54 @@ class _ValentineHomeState extends State<ValentineHome> {
             ),
             const SizedBox(height: 14),
             Expanded(
-              child: Center(
-                child: CustomPaint(
-                  size: const Size(300, 300),
-                  painter: HeartEmojiPainter(type: selectedEmoji),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (showBalloons)
+                  Positioned(
+                    left: 10,
+                    child: SizedBox(
+                      width: 100,
+                      height: 150,
+                      child: Image.asset(
+                        'Assets/Images/balloons.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                if (showBalloons)
+                  Positioned(
+                    right: 10,
+                    child: SizedBox(
+                      width: 100,
+                      height: 150,
+                      child: Image.asset(
+                        'Assets/Images/balloons.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _pulseController.value,
+                      child: CustomPaint(
+                        size: const Size(300, 300),
+                        painter:
+                            HeartEmojiPainter(type: selectedEmoji),
+                      ),
+                    );
+                  },
                 ),
+              ]
               ),
-            ),
+            )
           ],
         ),
-      )
+      ),
     );
   }
 }
