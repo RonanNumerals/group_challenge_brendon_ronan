@@ -81,9 +81,9 @@ class _ValentineHomeState extends State<ValentineHome>
                 },
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }
