@@ -79,7 +79,7 @@ class HeartEmojiPainter extends CustomPainter {
           center.dx, center.dy + 60)
       ..close();
 
-    // Different color = different emoji 
+    // Different color = different emoji
     paint.color =
         type == 'Party Heart'
             ? const Color(0xFFF48FB1)
@@ -114,7 +114,7 @@ class HeartEmojiPainter extends CustomPainter {
       mouthPaint,
     );
 
-    // Party Hat (For Party Heart)
+    // Party Hat (For Party heart)
     if (type == 'Party Heart') {
       final hatPaint = Paint()
         ..color = const Color(0xFFFFD54F);
