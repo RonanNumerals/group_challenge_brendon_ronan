@@ -30,27 +30,54 @@ class _ValentineHomeState extends State<ValentineHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Cupid\'s Canvas')),
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          DropdownButton<String>(
-            value: selectedEmoji,
-            items: emojiOptions
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (value) => setState(() => selectedEmoji = value ?? selectedEmoji),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 1,
+            colors: <Color>[
+              Color.fromARGB(255, 228, 141, 209),
+              Color.fromARGB(255, 220, 126, 137),
+            ],
+            tileMode: TileMode.mirror,
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Center(
-              child: CustomPaint(
-                size: const Size(300, 300),
-                painter: HeartEmojiPainter(type: selectedEmoji),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 2),
+            Align(
+              alignment: Alignment.topLeft,
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Button pressed!'),
+                    ),
+                  );
+                },
+                child: Text('Click me'),
+              )
+            ),
+            const SizedBox(height: 14),
+            DropdownButton<String>(
+              value: selectedEmoji,
+              items: emojiOptions
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) => setState(() => selectedEmoji = value ?? selectedEmoji),
+            ),
+            const SizedBox(height: 14),
+            Expanded(
+              child: Center(
+                child: CustomPaint(
+                  size: const Size(300, 300),
+                  painter: HeartEmojiPainter(type: selectedEmoji),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }
