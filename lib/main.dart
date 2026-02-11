@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() => runApp(const ValentineApp());
 
@@ -22,9 +23,30 @@ class ValentineHome extends StatefulWidget {
   State<ValentineHome> createState() => _ValentineHomeState();
 }
 
-class _ValentineHomeState extends State<ValentineHome> {
+class _ValentineHomeState extends State<ValentineHome>
+    with SingleTickerProviderStateMixin {
+
   final List<String> emojiOptions = ['Sweet Heart', 'Party Heart'];
   String selectedEmoji = 'Sweet Heart';
+
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+      lowerBound: 0.95,
+      upperBound: 1.05,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +67,18 @@ class _ValentineHomeState extends State<ValentineHome> {
           const SizedBox(height: 16),
           Expanded(
             child: Center(
-              child: CustomPaint(
-                size: const Size(300, 300),
-                painter: HeartEmojiPainter(type: selectedEmoji),
+              child: AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _pulseController.value,
+                    child: CustomPaint(
+                      size: const Size(300, 300),
+                      painter:
+                          HeartEmojiPainter(type: selectedEmoji),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -109,12 +140,12 @@ class HeartEmojiPainter extends CustomPainter {
       Rect.fromCircle(
           center: Offset(center.dx, center.dy + 20), radius: 30),
       0,
-      3.14,
+      pi,
       false,
       mouthPaint,
     );
 
-    // Party Hat (For Party heart)
+    // Party Hat (For Party Heart Only)
     if (type == 'Party Heart') {
       final hatPaint = Paint()
         ..color = const Color(0xFFFFD54F);
